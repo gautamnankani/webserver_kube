@@ -15,20 +15,30 @@ launch_container(){
 	fi
 }
 
-dir="/jen_pro_task3/test555"
+
+dir="test555"
+html_files=$(ls $dir | grep [.]html)
+php_files=$(ls $dir | grep [.]php)
+
 if [[ -n $(ls $dir | grep [.]html) ]]
 then
 	echo $file_name
 	launch_container jen_html.yml
 	pod_name=$(kubectl get pods -o=jsonpath='{.items[*].metadata.name}' -l app=html-webserver)
-	kubectl cp test555/*.html $pod_name:/usr/local/apache2/htdocs/
+	for file in $html_files
+	do
+	  kubectl cp test555/$file $pod_name:/usr/local/apache2/htdocs/
+        done
 fi
 if [[ -n $(ls $dir | grep [.]php) ]]
 then
 	echo $file_name
 	launch_container jen_php.yml
 	pod_name=$(kubectl get pods -o=jsonpath='{.items[*].metadata.name}' -l app=php-webserver)
-	kubectl cp test555/*.php $pod_name:/var/www/html/
+	for file in $php_files
+	do
+	  kubectl cp test555/$file $pod_name:/var/www/html/
+        done
 fi
 
 
