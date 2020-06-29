@@ -7,15 +7,20 @@ dir="test555"
 html_files=$(ls $dir | grep [.]html)
 php_files=$(ls $dir | grep [.]php)
 
-stat="false"
-echo "waiting for html container to start"
-while [ $stat != "true" ]
-do
-        stat=$(kubectl get pods -o=jsonpath={.items[*].status.containerStatuses[0].started} -l app=html-webserver)
+wait_for_start(){
+  selector=$1
+  stat="false"
+  echo -ne "\nwaiting for $selector to start"
+  while [ $stat != "true" ]
+  do
+        stat=$(kubectl get pods -o=jsonpath={.items[*].status.containerStatuses[0].started} -l app=$selector)
 	sleep 1
 	echo -n "."
-done
-echo " html Server Started "
+  done
+  echo -e "\n$selector Started"
+}
+
+wait_for_start html-webserver
 
 echo -n "Copying html files: "
 for file in $html_files
@@ -23,17 +28,8 @@ do
   echo -n "."
   kubectl cp test555/$file $html_pod_name:/usr/local/apache2/htdocs/
 done
-echo " "
 
-stat="false"
-echo "waiting for php container to start"
-while [ $stat != "true" ]
-do
-        stat=$(kubectl get pods -o=jsonpath={.items[*].status.containerStatuses[0].started} -l app=php-webserver)
-	sleep 1
-	echo -n "."
-done
-echo "php Server Started"
+wait_for_start php-webserver
 
 echo -n "Copying php files: "
 for file in $php_files   
