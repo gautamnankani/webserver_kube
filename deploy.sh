@@ -25,12 +25,12 @@ dir="test555"
 
 if [[ -n $(ls $dir | grep [.]html) ]]
 then
-	launch_container jen_html.yml
+	launch_container webserver_kube/jen_html.yml
 fi
 
 if [[ -n $(ls $dir | grep [.]php) ]]
 then
-	launch_container jen_php.yml
+	launch_container webserver_kube/jen_php.yml
 fi
 
 
